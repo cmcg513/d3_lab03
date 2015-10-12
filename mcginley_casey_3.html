@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+	<head>
+    <title>Country GDP vs Easy of business</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+    <style>
+      html, body, div, h1 {
+        margin: 0;
+        padding: 0;
+        border: 0;
+        outline: 0;
+        font-family: arial;
+      }
+      div#header {
+        background-color: #191987;
+        padding: 5px;
+      }
+      div#header h1{
+        color: white;
+      }
+      form {
+        display: inline-block;
+      }
+      p#result {
+        display: inline-block;
+        margin: 0;
+        font-weight: bold;
+      }
+      div#search {
+        padding: 5px;
+        padding-top: 30px;
+      }
+      button {
+        background-color: #191987;
+        color: white;
+        border: 0;
+      }
+    </style>
+	</head>
+
+	<body>
+    <script type="text/javascript">
+        var countries;
+        d3.csv("data.csv", function(data) {
+            countries = load(data);
+        });
+        
+        function load(data) {
+            var mappedData = data.map(function(d) {
+                return {
+                    name: d.Country,
+                    GDP: +d['GDP per Capita'].replace("$","").replace(",",""),
+                    GDPstring: d['GDP per Capita'],
+                    Year: new Date(d.Year).getYear() + 1900
+                }
+            });
+            
+            mappedData = mappedData.filter(function(d) {
+                return d.Year == 2012;
+            })
+            return mappedData;
+        }
+
+        function findGDP(name) {
+            country = countries.filter(function(d) {
+                return d.name == name;
+            });
+            console.log(country);
+            
+            return (country.length == 1) ? (name + ": " + country[0].GDPstring) : "NA";
+        }
+
+        function getCountry() {
+            var country = d3.select("input#country").property("value")
+            console.log(country)
+            var gdp = findGDP(country)
+            d3.select("p#result").text(gdp)
+        }
+        
+    </script>
+
+    <div id="header">
+      <h1> Country GDP vs Easy of business </h1>
+    </div>
+    <div id="search">
+      <form>
+        Search: 
+        <input type="text" id="country" onkeypress="javascript:return ((event.keyCode == 13) ? false : true)">
+        <button type="button" onclick="getCountry()"> GO </button> GDP: 
+      </form>
+      <p id="result">
+      </p>
+    </div>
+	</body>
+</html>
